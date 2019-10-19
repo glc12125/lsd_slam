@@ -28,7 +28,7 @@
 #include "lsd_slam_viewer/LSDSLAMViewerParamsConfig.h"
 #include <qapplication.h>
 
-
+#include "geometry_msgs/PoseStamped.h"
 #include "lsd_slam_viewer/keyframeGraphMsg.h"
 #include "lsd_slam_viewer/keyframeMsg.h"
 
@@ -74,6 +74,16 @@ void frameCb(lsd_slam_viewer::keyframeMsgConstPtr msg)
 	if(viewer != 0)
 		viewer->addFrameMsg(msg);
 }
+
+void poseCb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+	//ROS_INFO_STREAM("Received pose: " << msg);
+
+	if(viewer != 0)
+		viewer->addPoseMsg(msg);
+}
+
+
 void graphCb(lsd_slam_viewer::keyframeGraphMsgConstPtr msg)
 {
 	if(viewer != 0)
@@ -99,6 +109,7 @@ void rosThreadLoop( int argc, char** argv )
 
 	ros::Subscriber liveFrames_sub = nh.subscribe(nh.resolveName("lsd_slam/liveframes"),1, frameCb);
 	ros::Subscriber keyFrames_sub = nh.subscribe(nh.resolveName("lsd_slam/keyframes"),20, frameCb);
+	ros::Subscriber pose_sub = nh.subscribe(nh.resolveName("lsd_slam/pose"),20, poseCb);
 	ros::Subscriber graph_sub       = nh.subscribe(nh.resolveName("lsd_slam/graph"),10, graphCb);
 
 	ros::spin();

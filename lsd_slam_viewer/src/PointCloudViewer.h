@@ -29,6 +29,7 @@
 #include "qevent.h"
 #include "lsd_slam_viewer/keyframeMsg.h"
 #include "lsd_slam_viewer/keyframeGraphMsg.h"
+#include "geometry_msgs/PoseStamped.h"
 
 #include "QGLViewer/keyFrameInterpolator.h"
 
@@ -159,7 +160,7 @@ public:
 
 	void addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg);
 	void addGraphMsg(lsd_slam_viewer::keyframeGraphMsgConstPtr msg);
-
+	void addPoseMsg(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
 protected :
 	virtual void draw();
