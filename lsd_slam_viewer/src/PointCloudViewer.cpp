@@ -142,13 +142,10 @@ void PointCloudViewer::addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg)
 void PointCloudViewer::addPoseMsg(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
 	meddleMutex.lock();
-
-	camera()->setPosition(qglviewer::Vec(msg->pose.position.x,msg->pose.position.y,msg->pose.position.z));
-	//camera()->setViewDirection(qglviewer::Vec(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z));
-	camera()->setOrientation(qglviewer::Quaternion(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w));
-	
-	//camera()->fitSphere(qglviewer::Vec(msg->pose.position.x,msg->pose.position.y,-msg->pose.position.z), 2);
-
+	//camera()->setPosition(qglviewer::Vec(msg->pose.position.x,msg->pose.position.y,msg->pose.position.z));
+	//camera()->setOrientation(qglviewer::Quaternion(msg->pose.orientation.x,msg->pose.orientation.y,msg->pose.orientation.z,msg->pose.orientation.w));
+	//camera()->setOrientation(M_PI, 0);
+	////camera()->setUpVector(qglviewer::Vec(msg->pose.orientation.x, 0, 0) ^ qglviewer::Vec(msg->pose.orientation.x, msg->pose.position.y, msg->pose.orientation.z));
 	meddleMutex.unlock();
 }
 
@@ -166,8 +163,9 @@ void PointCloudViewer::init()
 {
 	setAnimationPeriod(30);
 	startAnimation();
-	//camera()->setUpVector(qglviewer::Vec(0,-1,0));
-	camera()->setViewDirection(qglviewer::Vec(0,0,1));
+	camera()->setPosition(qglviewer::Vec(0,0,-0.1));
+	camera()->setUpVector(qglviewer::Vec(0,-1,0));
+	//camera()->setViewDirection(qglviewer::Vec(0,0,1));
 	camera()->setZNearCoefficient(0.1);
 	camera()->setSceneRadius(1);
 	//camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);

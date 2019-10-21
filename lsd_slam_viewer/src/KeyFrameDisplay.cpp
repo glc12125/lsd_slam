@@ -185,9 +185,9 @@ void KeyFrameDisplay::refreshPC()
 					continue;
 			}
 
-			tmpBuffer[vertexBufferNumPoints].point[0] = (x*fxi + cxi) * depth;
+			tmpBuffer[vertexBufferNumPoints].point[0] = -(x*fxi + cxi) * depth;
 			tmpBuffer[vertexBufferNumPoints].point[1] = (y*fyi + cyi) * depth;
-			tmpBuffer[vertexBufferNumPoints].point[2] = depth;
+			tmpBuffer[vertexBufferNumPoints].point[2] = -depth;
 
 			tmpBuffer[vertexBufferNumPoints].color[3] = 100;
 			tmpBuffer[vertexBufferNumPoints].color[2] = originalInput[x+y*width].color[0];
@@ -367,8 +367,8 @@ void KeyFrameDisplay::drawPC(float pointSize, float alpha)
 
 	glPushMatrix();
 
-		Sophus::Matrix4f m = camToWorld.matrix();
-		glMultMatrixf((GLfloat*)m.data());
+		//Sophus::Matrix4f m = camToWorld.matrix();
+		//glMultMatrixf((GLfloat*)m.data());
 
 		glPointSize(pointSize);
 
