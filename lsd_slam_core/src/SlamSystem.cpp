@@ -510,6 +510,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
 {
     Frame* newReferenceKF=0;
     std::shared_ptr<Frame> newKeyframeCandidate = latestTrackedFrame;
+/*
     if(doKFReActivation && SLAMEnabled)
     {
         struct timeval tv_start, tv_end;
@@ -519,7 +520,7 @@ void SlamSystem::changeKeyframe(bool noCreate, bool force, float maxScore)
         msFindReferences = 0.9*msFindReferences + 0.1*((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
         nFindReferences++;
     }
-
+*/
     if(newReferenceKF != 0) {
         std::cout << "[changeKeyframe] newReferenceKF is not null, so loading new current key frame\n";
         loadNewCurrentKeyframe(newReferenceKF);
@@ -751,6 +752,7 @@ bool SlamSystem::doMappingIteration()
         return false;
 
     //std::cout << "[doMappingIteration] doMapping: " << doMapping << ", currentKeyFrame->idxInKeyframes: " << currentKeyFrame->idxInKeyframes << "\n";
+
     if(!doMapping && currentKeyFrame->idxInKeyframes < 0)
     {
         std::cout << "[doMappingIteration] currentKeyFrame->numMappedOnThisTotal " << currentKeyFrame->numMappedOnThisTotal << "\n";
@@ -778,6 +780,7 @@ bool SlamSystem::doMappingIteration()
     // set mappingFrame
     if(trackingIsGood)
     {   
+
         if(!doMapping)
         {
             printf("tryToChange refframe, lastScore %f!\n", lastTrackingClosenessScore);
@@ -1041,8 +1044,11 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
 
 
     unmappedTrackedFramesMutex.lock();
-    if(unmappedTrackedFrames.size() < 50 || (unmappedTrackedFrames.size() < 100 && trackingNewFrame->getTrackingParent()->numMappedOnThisTotal < 10))
+    if(unmappedTrackedFrames.size() < 50 || (unmappedTrackedFrames.size() < 100 && trackingNewFrame->getTrackingParent()->numMappedOnThisTotal < 10)){
         unmappedTrackedFrames.push_back(trackingNewFrame);
+    } else {
+        std::cout << "[trackFrame] too many frames to track, dropping...\n";
+    }
     unmappedTrackedFramesSignal.notify_one();
     unmappedTrackedFramesMutex.unlock();
 
