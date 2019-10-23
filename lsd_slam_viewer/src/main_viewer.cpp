@@ -68,7 +68,6 @@ void dynConfCb(lsd_slam_viewer::LSDSLAMViewerParamsConfig &config, uint32_t leve
 
 void frameCb(lsd_slam_viewer::keyframeMsgConstPtr msg)
 {
-
 	if(msg->time > lastFrameTime) return;
 
 	if(viewer != 0)

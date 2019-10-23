@@ -115,6 +115,7 @@ void DepthMap::observeDepthRow(int yMin, int yMax, RunningStats* stats)
 	int successes = 0;
 
 	for(int y=yMin;y<yMax; y++)
+	{
 		for(int x=3;x<width-3;x++)
 		{
 			int idx = x+y*width;
@@ -141,6 +142,7 @@ void DepthMap::observeDepthRow(int yMin, int yMax, RunningStats* stats)
 			if(success)
 				successes++;
 		}
+	}
 
 
 }
@@ -485,12 +487,12 @@ void DepthMap::propagateDepth(Frame* new_keyframe)
 	runningStats.num_prop_merged = 0;
 
 
-	if(new_keyframe->getTrackingParent() != activeKeyFrame)
+	/*if(new_keyframe->getTrackingParent() != activeKeyFrame)
 	{
 		printf("WARNING: propagating depth from frame %d to %d, which was tracked on a different frame (%d).\nWhile this should work, it is not recommended.",
 				activeKeyFrame->id(), new_keyframe->id(),
 				new_keyframe->getTrackingParent()->id());
-	}
+	}*/
 
 	// wipe depthmap
 	for(DepthMapPixelHypothesis* pt = otherDepthMap+width*height-1; pt >= otherDepthMap; pt--)
@@ -505,8 +507,8 @@ void DepthMap::propagateDepth(Frame* new_keyframe)
 	Eigen::Matrix3f trafoInv_R = oldToNew_SE3.rotationMatrix().matrix().cast<float>();
 
 
-	const bool* trackingWasGood = new_keyframe->getTrackingParent() == activeKeyFrame ? new_keyframe->refPixelWasGoodNoCreate() : 0;
-
+	//const bool* trackingWasGood = new_keyframe->getTrackingParent() == activeKeyFrame ? new_keyframe->refPixelWasGoodNoCreate() : 0;
+	const bool* trackingWasGood = 0;
 
 	const float* activeKFImageData = activeKeyFrame->image(0);
 	const float* newKFMaxGrad = new_keyframe->maxGradients(0);
