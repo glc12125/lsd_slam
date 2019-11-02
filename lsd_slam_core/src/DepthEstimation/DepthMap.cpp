@@ -1501,7 +1501,8 @@ inline float DepthMap::doLineStereo(
 	// if the assumed far-point lies behind the image or closter than the near-point,
 	// we moved past the Point it and should stop.
 	if(pFar[2] < 0.001f || max_idepth < min_idepth)
-	{
+	{	
+		std::cout << "[doLineStereo] pFar is invalid\n";
 		if(enablePrintDebugInfo) stats->num_stereo_inf_oob++;
 		return -1;
 	}
