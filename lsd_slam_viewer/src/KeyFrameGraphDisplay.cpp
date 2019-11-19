@@ -49,8 +49,8 @@ void KeyFrameGraphDisplay::draw()
     float color[3] = {0,0,1};
     int s = keyframes.size() - 1;
     if(s != -1) {
-        if(showKFCameras)
-            keyframes[s]->drawCam(lineTesselation, color);
+        //if(showKFCameras)
+        //    keyframes[s]->drawCam(lineTesselation, color);
 
         if((showKFPointclouds && (int)s > cutFirstNKf) || s == keyframes.size()-1)
             keyframes[s]->drawPC(pointTesselation, 1);
@@ -119,7 +119,7 @@ void KeyFrameGraphDisplay::draw()
 
 
 
-
+/*
     if(showConstraints)
     {
         // draw constraints
@@ -143,7 +143,7 @@ void KeyFrameGraphDisplay::draw()
         }
         glEnd();
     }
-
+*/
     dataMutex.unlock();
 }
 

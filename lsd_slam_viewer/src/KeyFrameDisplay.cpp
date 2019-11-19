@@ -154,12 +154,12 @@ void KeyFrameDisplay::refreshPC()
 			total++;
 
 
-			if(my_sparsifyFactor > 1 && rand()%my_sparsifyFactor != 0) continue;
+			//if(my_sparsifyFactor > 1 && rand()%my_sparsifyFactor != 0) continue;
 
 			float depth = 1 / originalInput[x+y*width].idepth;
 			float depth4 = depth*depth; depth4*= depth4;
 
-
+/*
 			if(originalInput[x+y*width].idepth_var * depth4 > my_scaledTH)
 				continue;
 
@@ -183,7 +183,7 @@ void KeyFrameDisplay::refreshPC()
 
 				if(nearSupport < my_minNearSupport)
 					continue;
-			}
+			}*/
 
 			tmpBuffer[vertexBufferNumPoints].point[0] = -(x*fxi + cxi) * depth;
 			tmpBuffer[vertexBufferNumPoints].point[1] = (y*fyi + cyi) * depth;

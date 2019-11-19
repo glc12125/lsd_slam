@@ -80,6 +80,7 @@ DepthMap::DepthMap(int w, int h, const Eigen::Matrix3f& K)
 	nObserve = nRegularize = nPropagate = nFillHoles = nSetDepth = 0;
 	nAvgUpdate = nAvgCreate = nAvgFinalize = 0;
 	nAvgObserve = nAvgRegularize = nAvgPropagate = nAvgFillHoles = nAvgSetDepth = 0;
+	plotStereoImages = true;
 }
 
 DepthMap::~DepthMap()
@@ -125,12 +126,15 @@ void DepthMap::observeDepthRow(int yMin, int yMax, RunningStats* stats)
 			// ======== 1. check absolute grad =========
 			if(hasHypothesis && keyFrameMaxGradBuf[idx] < MIN_ABS_GRAD_DECREASE)
 			{
+				//std::cout << "keyFrameMaxGradBuf[idx]: " << keyFrameMaxGradBuf[idx] << " < " << MIN_ABS_GRAD_DECREASE << "\n";
 				target->isValid = false;
 				continue;
 			}
 
-			if(keyFrameMaxGradBuf[idx] < MIN_ABS_GRAD_CREATE || target->blacklisted < MIN_BLACKLIST)
+			if(keyFrameMaxGradBuf[idx] < MIN_ABS_GRAD_CREATE || target->blacklisted < MIN_BLACKLIST) {
+				//std::cout << "keyFrameMaxGradBuf[idx]: " << keyFrameMaxGradBuf[idx] << " < " << MIN_ABS_GRAD_CREATE << "\n";
 				continue;
+			}
 
 
 			bool success;
@@ -201,6 +205,7 @@ bool DepthMap::makeAndCheckEPL(const int x, const int y, const Frame* const ref,
 	float eplLengthSquared = epx*epx+epy*epy;
 	if(eplLengthSquared < MIN_EPL_LENGTH_SQUARED)
 	{
+		//std::cout << "eplLengthSquared(" << eplLengthSquared << ") < MIN_EPL_LENGTH_SQUARED(" << MIN_EPL_LENGTH_SQUARED << ")\n";
 		if(enablePrintDebugInfo) stats->num_observe_skipped_small_epl++;
 		return false;
 	}
@@ -214,6 +219,7 @@ bool DepthMap::makeAndCheckEPL(const int x, const int y, const Frame* const ref,
 
 	if(eplGradSquared < MIN_EPL_GRAD_SQUARED)
 	{
+		//std::cout << "eplGradSquared(" << eplGradSquared << ") < MIN_EPL_GRAD_SQUARED(" << MIN_EPL_GRAD_SQUARED << ")\n";
 		if(enablePrintDebugInfo) stats->num_observe_skipped_small_epl_grad++;
 		return false;
 	}
@@ -222,6 +228,7 @@ bool DepthMap::makeAndCheckEPL(const int x, const int y, const Frame* const ref,
 	// ===== check epl-grad angle ======
 	if(eplGradSquared / (gx*gx+gy*gy) < MIN_EPL_ANGLE_SQUARED)
 	{
+		//std::cout << "epl-grad angle(" << eplGradSquared / (gx*gx+gy*gy) << ") < MIN_EPL_ANGLE_SQUARED(" << MIN_EPL_ANGLE_SQUARED << ")\n";
 		if(enablePrintDebugInfo) stats->num_observe_skipped_small_epl_angle++;
 		return false;
 	}
@@ -247,6 +254,7 @@ bool DepthMap::observeDepthCreate(const int &x, const int &y, const int &idx, Ru
 		bool* wasGoodDuringTracking = refFrame->refPixelWasGoodNoCreate();
 		if(wasGoodDuringTracking != 0 && !wasGoodDuringTracking[(x >> SE3TRACKING_MIN_LEVEL) + (width >> SE3TRACKING_MIN_LEVEL)*(y >> SE3TRACKING_MIN_LEVEL)])
 		{
+			std::cout << "wasGoodDuringTracking: " << *wasGoodDuringTracking << "\n";
 			if(plotStereoImages)
 				debugImageHypothesisHandling.at<cv::Vec3b>(y, x) = cv::Vec3b(255,0,0); // BLUE for SKIPPED NOT GOOD TRACKED
 			return false;
@@ -255,7 +263,10 @@ bool DepthMap::observeDepthCreate(const int &x, const int &y, const int &idx, Ru
 
 	float epx, epy;
 	bool isGood = makeAndCheckEPL(x, y, refFrame, &epx, &epy, stats);
-	if(!isGood) return false;
+	if(!isGood) {
+		//std::cout << "makeAndCheckEPL return false\n";
+		return false;
+	}
 
 	if(enablePrintDebugInfo) stats->num_observe_create_attempted++;
 
@@ -332,7 +343,10 @@ bool DepthMap::observeDepthUpdate(const int &x, const int &y, const int &idx, co
 
 	float epx, epy;
 	bool isGood = makeAndCheckEPL(x, y, refFrame, &epx, &epy, stats);
-	if(!isGood) return false;
+	if(!isGood) {
+		//std::cout << "makeAndCheckEPL return false\n";
+		return false;
+	}
 
 	// which exact point to track, and where from.
 	float sv = sqrt(target->idepth_var_smoothed);
@@ -340,6 +354,12 @@ bool DepthMap::observeDepthUpdate(const int &x, const int &y, const int &idx, co
 	float max_idepth = target->idepth_smoothed + sv*STEREO_EPL_VAR_FAC;
 	if(min_idepth < 0) min_idepth = 0;
 	if(max_idepth > 1/MIN_DEPTH) max_idepth = 1/MIN_DEPTH;
+	/*if(max_idepth < 0) {
+		std::cout << "sv: " << sv << ", target->idepth_smoothed: " << target->idepth_smoothed << ", STEREO_EPL_VAR_FAC: " << STEREO_EPL_VAR_FAC << "\n";
+		std::cout << "max_idepth(" << max_idepth << ") is less than 0\n";
+		max_idepth = 1/MIN_DEPTH;
+	}*/
+
 
 	stats->num_observe_update_attempted++;
 
@@ -1502,7 +1522,7 @@ inline float DepthMap::doLineStereo(
 	// we moved past the Point it and should stop.
 	if(pFar[2] < 0.001f || max_idepth < min_idepth)
 	{	
-		std::cout << "[doLineStereo] pFar is invalid\n";
+		std::cout << "[doLineStereo] u: " << u << ", v: " << v << ", pFar(" << pFar[2] << "), max_idepth: " << max_idepth << ", min_idepth: " << min_idepth << "\n";
 		if(enablePrintDebugInfo) stats->num_stereo_inf_oob++;
 		return -1;
 	}
@@ -1515,8 +1535,8 @@ inline float DepthMap::doLineStereo(
 
 	// calculate increments in which we will step through the epipolar line.
 	// they are sampleDist (or half sample dist) long
-	float incx = pClose[0] - pFar[0];
-	float incy = pClose[1] - pFar[1];
+	float incx = (pClose[0] - pFar[0])/5.0;
+	float incy = (pClose[1] - pFar[1])/5.0;
 	float eplLength = sqrt(incx*incx+incy*incy);
 	if(!eplLength > 0 || std::isinf(eplLength)) return -4;
 
@@ -1865,6 +1885,7 @@ inline float DepthMap::doLineStereo(
 	// check if interpolated error is OK. use evil hack to allow more error if there is a lot of gradient.
 	if(best_match_err > (float)MAX_ERROR_STEREO + sqrtf( gradAlongLine)*20)
 	{
+		std::cout << "best_match_err(" << best_match_err <<") is too big: " << MAX_ERROR_STEREO << " + " << sqrtf( gradAlongLine)*20 << "\n";
 		if(enablePrintDebugInfo) stats->num_stereo_invalid_bigErr++;
 		return -3;
 	}
@@ -1906,6 +1927,7 @@ inline float DepthMap::doLineStereo(
 
 	if(idnew_best_match < 0)
 	{
+		//std::cout << "[doLineStereo] idnew_best_match(" << idnew_best_match << ") less than 0\n";
 		if(enablePrintDebugInfo) stats->num_stereo_negative++;
 		if(!allowNegativeIdepths)
 			return -2;

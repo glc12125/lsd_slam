@@ -167,7 +167,8 @@ void PointCloudViewer::init()
 	camera()->setUpVector(qglviewer::Vec(0,-1,0));
 	//camera()->setViewDirection(qglviewer::Vec(0,0,1));
 	camera()->setZNearCoefficient(0.1);
-	camera()->setSceneRadius(1);
+	camera()->setSceneRadius(3);
+	//camera()->showEntireScene();
 	//camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
 }
 
@@ -246,11 +247,11 @@ void PointCloudViewer::draw()
 
 
 
-	if(showCurrentCamera) {
+	/*if(showCurrentCamera) {
 		// update camera view pose to let camera follow the current frame
 
 		currentCamDisplay->drawCam(2*lineTesselation, 0);
-	}
+	}*/
 
 	if(showCurrentPointcloud)
 		currentCamDisplay->drawPC(pointTesselation, 1);

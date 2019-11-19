@@ -422,7 +422,7 @@ void SlamSystem::finishCurrentKeyframe()
     }
 
     if(outputWrapper!= 0){
-        std::cout << "[finishCurrentKeyframe] publishKeyframe\n";
+        std::cout << "[finishCurrentKeyframe] publishKeyframe " << currentKeyFrame.get()->id() << "\n";
         outputWrapper->publishKeyframe(currentKeyFrame.get());
     }
 }
@@ -616,8 +616,10 @@ bool SlamSystem::updateKeyframe()
 
     continuousPCOutput = true;
     if(outputWrapper != 0 && continuousPCOutput && currentKeyFrame != 0) {
-        std::cout << "[updateKeyframe] publishKeyframe\n";
+        std::cout << "[updateKeyframe] publishKeyframe " << currentKeyFrame.get()->id() << "\n";
         outputWrapper->publishKeyframe(currentKeyFrame.get());
+    } else {
+        std::cout << "outputWrapper: " << outputWrapper << ", continuousPCOutput: " << continuousPCOutput << ", currentKeyFrame: " << currentKeyFrame << "\n";
     }
 
     return true;
@@ -818,6 +820,7 @@ bool SlamSystem::doMappingIteration()
     }
     else
     {
+        std::cout << "Tracking is not good!\n";
         // invalidate map if it was valid.
         if(map->isValid())
         {
@@ -1046,6 +1049,7 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID, bool blockUntilM
     unmappedTrackedFramesMutex.lock();
     if(unmappedTrackedFrames.size() < 50 || (unmappedTrackedFrames.size() < 100 && trackingNewFrame->getTrackingParent()->numMappedOnThisTotal < 10)){
         unmappedTrackedFrames.push_back(trackingNewFrame);
+        std::cout << "unmappedTrackedFrames.size(): " << unmappedTrackedFrames.size() << "\n";
     } else {
         std::cout << "[trackFrame] too many frames to track, dropping...\n";
     }
