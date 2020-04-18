@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosbag
   message_generation
   roslib
+  cmake_modules
 )
 
 find_package(OpenGL REQUIRED)
@@ -29,12 +30,16 @@ set(QT_USE_QTXML TRUE)
 find_package(QGLViewer REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
+#find_package(OpenCV 3.4.5 EXACT REQUIRED PATHS /Development/lib_opencv_3.4.5/share/OpenCV/ NO_DEFAULT_PATH)
 find_package(Boost REQUIRED COMPONENTS thread)
 
 include_directories(${QGLVIEWER_INCLUDE_DIR}
 		    ${catkin_INCLUDE_DIRS} 
 		    ${EIGEN_INCLUDE_DIR}
-		    ${QT_INCLUDES} )
+		    ${QT_INCLUDES}
+        ${G2O_INCLUDE_DIR}
+        ${OpenCV_INCLUDE_DIRS}
+)
 
 # SSE flags
 set(CMAKE_CXX_FLAGS

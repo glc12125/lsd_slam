@@ -18,6 +18,7 @@
 * along with LSD-SLAM. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <opencv2/opencv.hpp>
 #include "LiveSLAMWrapper.h"
 
 #include <boost/thread.hpp>
