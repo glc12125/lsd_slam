@@ -40,7 +40,7 @@ using namespace cv;
 ROSImageStreamThread::ROSImageStreamThread()
 {
 	// subscribe
-	vid_channel = nh_.resolveName("image");
+	vid_channel = nh_.resolveName("image_raw");
 	vid_sub          = nh_.subscribe(vid_channel,1, &ROSImageStreamThread::vidCb, this);
 
 
